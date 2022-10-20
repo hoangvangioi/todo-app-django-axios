@@ -34,7 +34,7 @@ function getCookie(name) {
 }
 
 const csrftoken = getCookie('csrftoken');
-const BASE_URL = 'http://127.0.0.1:8000'
+const BASE_URL = 'https://todoapp-api.hoangvangioi.xyz'
 const headers = {
     'Content-type': 'application/json',
     'X-CSRFToken': csrftoken
