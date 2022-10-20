@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import render
 
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, RetrieveDestroyAPIView
 from rest_framework.views import APIView
 from rest_framework import status
 
@@ -67,10 +67,11 @@ class TaskUpdateAPIView(APIView):
             return Response({"message": "Failed", "details": serializer.errors, "status": status.HTTP_400_BAD_REQUEST})
 
 
-class TaskDestroyAPIView(DestroyAPIView):
+class TaskDestroyAPIView(RetrieveDestroyAPIView):
+    queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
-    def get_queryset(self):
-        queryset = Task.objects.get(id=self.kwargs['pk'])
-        queryset.delete()
-        return queryset
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
