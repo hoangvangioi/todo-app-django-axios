@@ -4,7 +4,6 @@ from .views import TaskListAPIView, TaskRetrieveAPIView, TaskDestroyAPIView, Tas
 from rest_framework.urlpatterns import format_suffix_patterns
 
 
-
 urlpatterns = [
     path('', views.api, name = 'api'),
     path('task-update/<str:pk>/', views.taskUpdate, name = 'task_update'),
