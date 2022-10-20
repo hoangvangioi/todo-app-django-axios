@@ -143,3 +143,12 @@ CORS_ALLOWED_ORIGINS = [
 
 # Activate Django-Heroku.
 django_on_heroku.settings(locals(), logging=False)
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    )
+}
