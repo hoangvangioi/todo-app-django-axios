@@ -31,8 +31,11 @@ class TaskListAPIView(ListAPIView):
 
 
 class TaskRetrieveAPIView(RetrieveAPIView):
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
+
+    def get_queryset(self):
+        queryset = Task.objects.get(id=self.kwargs['pk'])
+        return queryset
 
 
 class TaskCreateAPIView(CreateAPIView):
@@ -57,6 +60,10 @@ class TaskUpdateAPIView(APIView):
         except Task.DoesNotExist:
             raise Http404
 
+    def get_queryset(self):
+        queryset = Task.objects.get(id=self.kwargs['pk'])
+        return queryset
+
     def post(self, request, pk, format=None):
         tasks = self.get_object(pk)
         serializer = TaskSerializer(tasks, data=request.data)
@@ -68,8 +75,11 @@ class TaskUpdateAPIView(APIView):
 
 
 class TaskDestroyAPIView(RetrieveDestroyAPIView):
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
+
+    def get_queryset(self):
+        queryset = Task.objects.get(id=self.kwargs['pk'])
+        return queryset
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
