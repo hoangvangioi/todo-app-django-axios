@@ -1,8 +1,10 @@
+from django.http import Http404
 from django.shortcuts import render
 
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, RetrieveAPIView
+from rest_framework.views import APIView
+from rest_framework import status
 
 from api.models import Task
 from api.serializers import TaskSerializer
@@ -10,16 +12,17 @@ from api.serializers import TaskSerializer
 # Create your views here.
 
 
-@api_view(['GET'])
-def api(request):
-    api_urls = {
-        'List View': '/task-list/',
-        'Detail View': '/task-detail/<str:pk>/',
-        'Create': '/task-create/',
-        'Update': '/task-update/<str:pk>/',
-        'Delete': '/task-delete/<str:pk>/',
-    }
-    return Response(api_urls)
+class API(APIView):
+
+    def get(self, request):
+        tasks = {
+            'List View': '/task-list/',
+            'Detail View': '/task-detail/<str:pk>/',
+            'Create': '/task-create/',
+            'Update': '/task-update/<str:pk>/',
+            'Delete': '/task-delete/<str:pk>/',
+        }
+        return Response(tasks)
 
 
 class TaskListAPIView(ListAPIView):
@@ -46,15 +49,22 @@ class TaskCreateAPIView(CreateAPIView):
         return Response({"message": "Created task successfully!", "details": serializer.data})
 
 
-@api_view(['POST'])
-def taskUpdate(request, pk, format=None):
-    task = Task.objects.get(id=pk)
-    serializer = TaskSerializer(instance = task , data = request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "mobile number updated successfully", "details": serializer.data})
-    else:
-        return Response({"message": "failed", "details": serializer.errors})
+class TaskUpdateAPIView(APIView):
+
+    def get_object(self, pk):
+        try:
+            return Task.objects.get(pk=pk)
+        except Task.DoesNotExist:
+            raise Http404
+
+    def post(self, request, pk, format=None):
+        tasks = self.get_object(pk)
+        serializer = TaskSerializer(tasks, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Task updated successfully!", "details": serializer.data})
+        else:
+            return Response({"message": "Failed", "details": serializer.errors, "status": status.HTTP_400_BAD_REQUEST})
 
 
 class TaskDestroyAPIView(DestroyAPIView):
